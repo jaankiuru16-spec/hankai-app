@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import logo from "@/assets/hankeit-logo.png";
+import { Music } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,12 @@ const TenantScreen = () => {
 
   const handleSelect = (role: "student" | "alumni") => {
     setRole(role);
-    navigate(role === "alumni" ? "/songbook" : "/home");
+    navigate("/home");
+  };
+
+  const handleSongbook = () => {
+    setRole("alumni");
+    navigate("/songbook");
   };
 
   return (
@@ -66,20 +72,33 @@ const TenantScreen = () => {
         </p>
 
         <div className="flex flex-col gap-3 w-full">
+          {/* Songbook — available to everyone */}
           <motion.button
             whileTap={{ scale: 0.97 }}
-            onClick={() => handleSelect("student")}
-            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg shadow-sm transition-colors hover:opacity-90"
+            onClick={handleSongbook}
+            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg shadow-sm transition-colors hover:opacity-90 flex items-center justify-center gap-2"
           >
-            {t("student")}
+            <Music size={20} />
+            {t("songbook")}
           </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={() => handleSelect("alumni")}
-            className="w-full py-4 rounded-xl bg-hankeit-ice text-hankeit-deep font-semibold text-lg shadow-sm border border-accent/20 transition-colors hover:bg-accent/20"
-          >
-            {t("alumni")}
-          </motion.button>
+
+          {/* Student & Alumni side by side */}
+          <div className="flex gap-3 w-full">
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={() => handleSelect("student")}
+              className="flex-1 py-3 rounded-xl bg-hankeit-ice text-hankeit-deep font-semibold text-sm shadow-sm border border-accent/20 transition-colors hover:bg-accent/20"
+            >
+              {t("student")}
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={() => handleSelect("alumni")}
+              className="flex-1 py-3 rounded-xl bg-hankeit-ice text-hankeit-deep font-semibold text-sm shadow-sm border border-accent/20 transition-colors hover:bg-accent/20"
+            >
+              {t("alumni")}
+            </motion.button>
+          </div>
         </div>
       </motion.div>
     </div>

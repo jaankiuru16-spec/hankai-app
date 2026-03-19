@@ -190,6 +190,18 @@ const LunchPage = () => {
           <span>{t("openingHours")}</span>
         </div>
 
+        {/* Dietary key at top */}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-1">
+            <DietaryBadge label="G" />
+            <span className="text-xs text-muted-foreground">{t("glutenFree")}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <DietaryBadge label="V" />
+            <span className="text-xs text-muted-foreground">{t("vegan")}</span>
+          </div>
+        </div>
+
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1 -mx-1 px-1">
           {days.map((day, i) => (
             <button
@@ -257,18 +269,6 @@ const LunchPage = () => {
             </div>
           </section>
         </motion.div>
-
-        {/* Dietary legend at bottom */}
-        <div className="flex items-center gap-4 mt-6 mb-10">
-          <div className="flex items-center gap-1">
-            <DietaryBadge label="G" />
-            <span className="text-xs text-muted-foreground">{t("glutenFree")}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <DietaryBadge label="V" />
-            <span className="text-xs text-muted-foreground">{t("vegan")}</span>
-          </div>
-        </div>
       </main>
     </div>
   );

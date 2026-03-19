@@ -1,17 +1,6 @@
+import { createClient } from '@supabase/supabase-js'
 
-import 'react-native-url-polyfill/auto'
-import { createClient, processLock } from '@supabase/supabase-js'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(
-  process.env.EXPO_PUBLIC_SUPABASE_URL!,
-  process.env.EXPO_PUBLIC_SUPABASE_KEY!,
-  {
-    auth: {
-      lock: processLock,
-    },
-  })
-export const supabaseAdmin = createClient(
-  process.env.EXPO_PUBLIC_SUPABASE_URL!,
-  process.env.EXPO_PUBLIC_SUPABASE_SERVICE_KEY! // NOT the anon key
-)
-  
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
