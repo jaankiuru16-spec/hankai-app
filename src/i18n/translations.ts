@@ -43,6 +43,11 @@ export const translations = {
     // Games
     gamesComing: "Our clicker game is coming soon. Stay tuned for something fun.",
     backToHome: "Back to Home",
+    staff: "Staff",
+    guests: "Guests",
+    noMenuAvailable: "No menu available for this day",
+    translate: "Translate",
+    funFacts: "History & Fun Facts",
   },
   fi: {
     whoAreYou: "Kuka olet?",
@@ -81,6 +86,11 @@ export const translations = {
     noFunFacts: "Tälle laululle ei ole vielä hauskoja faktoja.",
     gamesComing: "Klikkauuspelimme on tulossa pian. Pysy kuulolla!",
     backToHome: "Takaisin etusivulle",
+    staff: "Henkilökunta",
+    guests: "Vieraat",
+    noMenuAvailable: "Tälle päivälle ei ole menua saatavilla",
+    translate: "Käännä",
+    funFacts: "Historiaa ja hauskoja faktoja",
   },
   sv: {
     whoAreYou: "Vem ansluter du som?",
@@ -119,6 +129,11 @@ export const translations = {
     noFunFacts: "Inga roliga fakta tillgängliga för denna sång ännu.",
     gamesComing: "Vårt klickerspel kommer snart. Håll utkik!",
     backToHome: "Tillbaka till startsidan",
+    staff: "Personal",
+    guests: "Gäster",
+    noMenuAvailable: "Ingen meny tillgänglig för denna dag",
+    translate: "Översätt",
+    funFacts: "Historia & roliga fakta",
   },
 } as const;
 
