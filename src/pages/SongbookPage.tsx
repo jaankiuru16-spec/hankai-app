@@ -139,8 +139,8 @@ const SongbookPage = () => {
             <Loader2 size={28} className="animate-spin text-accent" />
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto px-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-1 pb-36">
+          <div className="flex-1 overflow-y-auto px-4 pb-20">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-1">
               {filtered.map((song, i) => (
                 <motion.button
                   key={song.id}
@@ -161,8 +161,8 @@ const SongbookPage = () => {
           </div>
         )}
 
-        <div className="sticky bottom-0 bg-background/80 backdrop-blur-lg border-t border-border px-4 py-3">
-          <div className="relative">
+        <div className="fixed bottom-0 left-0 right-0 z-10 bg-background/80 backdrop-blur-lg border-t border-border px-4 py-3">
+          <div className="max-w-lg mx-auto relative">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
