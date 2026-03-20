@@ -10,8 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const logo = "/tiles/logo.png";
-
 const langLabels = {
   en: "English",
   sv: "Svenska",
@@ -24,6 +22,7 @@ const TenantScreen = () => {
   const { setRole, language, setLanguage, darkMode, toggleDarkMode } = useApp();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const logo = darkMode ? "/tiles/logo.png" : "/tiles/logo-light.png";
 
   const handleSelect = (role: "student" | "alumni") => {
     setRole(role);
@@ -72,16 +71,16 @@ const TenantScreen = () => {
         className="flex flex-col items-center gap-8 w-full max-w-sm"
       >
         <div className="relative w-24 h-24">
-          <img src={logo} alt="Hankeit" className="w-24 h-24 rounded-2xl shadow-lg object-cover" style={{ clipPath: "inset(0 25% 0 0)" }} />
-          <img src={logo} alt="" className="absolute inset-0 w-24 h-24 rounded-2xl object-cover" style={{ clipPath: "inset(0 25% 0 25%)" }} />
+          <img src={logo} alt="Hankeit" className={`w-24 h-24 object-cover ${darkMode ? "rounded-2xl shadow-lg" : ""}`} style={{ clipPath: "inset(0 25% 0 0)" }} />
+          <img src={logo} alt="" className={`absolute inset-0 w-24 h-24 object-cover ${darkMode ? "rounded-2xl" : ""}`} style={{ clipPath: "inset(0 25% 0 25%)" }} />
           <motion.div
-            className="absolute inset-0 rounded-2xl overflow-hidden"
-            style={{ mixBlendMode: "lighten" }}
+            className={`absolute inset-0 overflow-hidden ${darkMode ? "rounded-2xl" : ""}`}
+            style={{ mixBlendMode: darkMode ? "lighten" : "darken" }}
             initial={{ x: 16 }}
             animate={{ x: 0 }}
             transition={{ duration: 0.4, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
           >
-            <img src={logo} alt="" className="w-24 h-24 rounded-2xl object-cover" style={{ clipPath: "inset(0 0 0 72%)" }} />
+            <img src={logo} alt="" className={`w-24 h-24 object-cover ${darkMode ? "rounded-2xl" : ""}`} style={{ clipPath: "inset(0 0 0 72%)" }} />
           </motion.div>
         </div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight font-display">Hankeit</h1>

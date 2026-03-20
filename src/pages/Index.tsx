@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApp } from "@/context/AppContext";
 
-const logo = "/tiles/logo.png";
-
 const Index = () => {
   const navigate = useNavigate();
-  const { role } = useApp();
+  const { role, darkMode } = useApp();
+  const logo = darkMode ? "/tiles/logo.png" : "/tiles/logo-light.png";
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,16 +28,16 @@ const Index = () => {
         className="flex flex-col items-center gap-4"
       >
         <div className="relative w-28 h-28">
-          <img src={logo} alt="Hankeit" className="w-28 h-28 rounded-3xl shadow-xl" style={{ clipPath: "inset(0 25% 0 0)" }} />
-          <img src={logo} alt="" className="absolute inset-0 w-28 h-28 rounded-3xl" style={{ clipPath: "inset(0 25% 0 25%)" }} />
+          <img src={logo} alt="Hankeit" className={`w-28 h-28 ${darkMode ? "rounded-3xl shadow-xl" : ""}`} style={{ clipPath: "inset(0 25% 0 0)" }} />
+          <img src={logo} alt="" className={`absolute inset-0 w-28 h-28 ${darkMode ? "rounded-3xl" : ""}`} style={{ clipPath: "inset(0 25% 0 25%)" }} />
           <motion.div
-            className="absolute inset-0 rounded-3xl overflow-hidden"
-            style={{ mixBlendMode: "lighten" }}
+            className={`absolute inset-0 overflow-hidden ${darkMode ? "rounded-3xl" : ""}`}
+            style={{ mixBlendMode: darkMode ? "lighten" : "darken" }}
             initial={{ x: 20 }}
             animate={{ x: 0 }}
             transition={{ duration: 0.4, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
           >
-            <img src={logo} alt="" className="w-28 h-28 rounded-3xl" style={{ clipPath: "inset(0 0 0 72%)" }} />
+            <img src={logo} alt="" className={`w-28 h-28 ${darkMode ? "rounded-3xl" : ""}`} style={{ clipPath: "inset(0 0 0 72%)" }} />
           </motion.div>
         </div>
         <motion.h1
