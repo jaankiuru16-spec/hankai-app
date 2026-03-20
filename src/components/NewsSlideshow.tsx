@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/connection/connection";
+import useEmblaCarousel from "embla-carousel-react";
 
-const SLIDE_DURATION = 5000;
+const AUTO_INTERVAL = 5000;
 
 interface NewsSlide {
   id: number;
@@ -14,8 +14,10 @@ interface NewsSlide {
 
 const NewsSlideshow = () => {
   const [slides, setSlides] = useState<NewsSlide[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false });
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -36,15 +38,25 @@ const NewsSlideshow = () => {
     fetchNews();
   }, []);
 
-  const next = useCallback(() => {
-    setCurrentIndex((prev) => (slides.length > 0 ? (prev + 1) % slides.length : 0));
-  }, [slides.length]);
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
 
   useEffect(() => {
-    if (slides.length === 0) return;
-    const interval = setInterval(next, SLIDE_DURATION);
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+    onSelect();
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi, onSelect]);
+
+  useEffect(() => {
+    if (!emblaApi || slides.length <= 1) return;
+    const interval = setInterval(() => {
+      emblaApi.scrollNext();
+    }, AUTO_INTERVAL);
     return () => clearInterval(interval);
-  }, [next, slides.length]);
+  }, [emblaApi, slides.length]);
 
   if (loading) {
     return (
@@ -56,59 +68,59 @@ const NewsSlideshow = () => {
 
   if (slides.length === 0) return null;
 
-  const slide = slides[currentIndex];
-
-  const content = (
+  return (
     <div className="relative w-full h-full rounded-2xl overflow-hidden">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentIndex}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="absolute inset-0"
-        >
-          <img
-            src={slide.image}
-            alt={slide.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-white/70 bg-white/15 px-2 py-0.5 rounded-full backdrop-blur-sm">
-              News
-            </span>
-            <h3 className="text-base font-bold text-white mt-1.5 font-display leading-tight">
-              {slide.title}
-            </h3>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+      <div ref={emblaRef} className="overflow-hidden w-full h-full">
+        <div className="flex h-full">
+          {slides.map((slide) => {
+            const inner = (
+              <div className="relative w-full h-full">
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-white/70 bg-white/15 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                    News
+                  </span>
+                  <h3 className="text-base font-bold text-white mt-1.5 font-display leading-tight">
+                    {slide.title}
+                  </h3>
+                </div>
+              </div>
+            );
+
+            return (
+              <div key={slide.id} className="min-w-0 flex-[0_0_100%] h-full">
+                {slide.link ? (
+                  <a href={slide.link} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                    {inner}
+                  </a>
+                ) : (
+                  inner
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="absolute bottom-2 right-3 flex gap-1.5 z-10">
         {slides.map((_, i) => (
           <button
             key={i}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCurrentIndex(i); }}
+            onClick={() => emblaApi?.scrollTo(i)}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === currentIndex ? "w-5 bg-white" : "w-1.5 bg-white/40"
+              i === selectedIndex ? "w-5 bg-white" : "w-1.5 bg-white/40"
             }`}
           />
         ))}
       </div>
     </div>
   );
-
-  if (slide.link) {
-    return (
-      <a href={slide.link} target="_blank" rel="noopener noreferrer" className="block w-full h-full cursor-pointer">
-        {content}
-      </a>
-    );
-  }
-
-  return content;
 };
 
 export default NewsSlideshow;

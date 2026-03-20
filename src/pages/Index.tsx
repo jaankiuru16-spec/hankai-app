@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import logo from "@/assets/hankeit-logo.png";
 import { useApp } from "@/context/AppContext";
+
+const logo = "/tiles/logo.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -27,11 +28,23 @@ const Index = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="flex flex-col items-center gap-4"
       >
-        <img src={logo} alt="Hankeit" className="w-28 h-28 rounded-3xl shadow-xl" />
+        <div className="relative w-28 h-28">
+          <img src={logo} alt="Hankeit" className="w-28 h-28 rounded-3xl shadow-xl" style={{ clipPath: "inset(0 25% 0 0)" }} />
+          <img src={logo} alt="" className="absolute inset-0 w-28 h-28 rounded-3xl" style={{ clipPath: "inset(0 25% 0 25%)" }} />
+          <motion.div
+            className="absolute inset-0 rounded-3xl overflow-hidden"
+            style={{ mixBlendMode: "lighten" }}
+            initial={{ x: 20 }}
+            animate={{ x: 0 }}
+            transition={{ duration: 0.4, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+          >
+            <img src={logo} alt="" className="w-28 h-28 rounded-3xl" style={{ clipPath: "inset(0 0 0 72%)" }} />
+          </motion.div>
+        </div>
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
           className="text-3xl font-bold text-foreground tracking-tight"
         >
           Hankeit

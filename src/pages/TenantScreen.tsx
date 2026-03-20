@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
 import { useTranslation } from "@/hooks/useTranslation";
-import logo from "@/assets/hankeit-logo.png";
+const logo = "/tiles/logo.png";
 import { Music } from "lucide-react";
 import {
   DropdownMenu,
@@ -64,7 +64,19 @@ const TenantScreen = () => {
         transition={{ duration: 0.5 }}
         className="flex flex-col items-center gap-8 w-full max-w-sm"
       >
-        <img src={logo} alt="Hankeit" className="w-24 h-24 rounded-2xl shadow-lg object-cover" />
+        <div className="relative w-24 h-24">
+          <img src={logo} alt="Hankeit" className="w-24 h-24 rounded-2xl shadow-lg object-cover" style={{ clipPath: "inset(0 25% 0 0)" }} />
+          <img src={logo} alt="" className="absolute inset-0 w-24 h-24 rounded-2xl object-cover" style={{ clipPath: "inset(0 25% 0 25%)" }} />
+          <motion.div
+            className="absolute inset-0 rounded-2xl overflow-hidden"
+            style={{ mixBlendMode: "lighten" }}
+            initial={{ x: 16 }}
+            animate={{ x: 0 }}
+            transition={{ duration: 0.4, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+          >
+            <img src={logo} alt="" className="w-24 h-24 rounded-2xl object-cover" style={{ clipPath: "inset(0 0 0 72%)" }} />
+          </motion.div>
+        </div>
         <h1 className="text-2xl font-bold text-foreground tracking-tight font-display">Hankeit</h1>
 
         <p className="text-muted-foreground text-center text-base">

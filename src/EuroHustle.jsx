@@ -135,12 +135,25 @@ function FaceChar({ type, size=44 }) {
 
 export default function EuroHustle() {
   const navigate = useNavigate();
-  const [euros, setEuros]                   = useState(0);
-  const [totalEarned, setTotalEarned]       = useState(0);
-  const [allTimeEarned, setAllTimeEarned]   = useState(0);
+  const eurosRef       = useRef(0);
+  const totalEarnedRef = useRef(0);
+  const allTimeRef     = useRef(0);
+  const clicksRef      = useRef(0);
+  const powerFillRef   = useRef(0);
+  const dpkRef         = useRef(1);
+  const dpsRef         = useRef(0);
+  const powerRef       = useRef(false);
+  const nextId         = useRef(0);
+  const billRef        = useRef(null);
+  const rafDirty       = useRef(false);
+
+  const [displayEuros, setDisplayEuros]       = useState(0);
+  const [displayTotal, setDisplayTotal]        = useState(0);
+  const [displayAllTime, setDisplayAllTime]    = useState(0);
+  const [displayClicks, setDisplayClicks]      = useState(0);
+  const [displayPowerFill, setDisplayPowerFill] = useState(0);
   const [allTimePerks, setAllTimePerks]     = useState(0);
   const [allTimeUpgrades, setAllTimeUpgrades] = useState(0);
-  const [allTimeClicks, setAllTimeClicks]   = useState(0);
   const [ownedPerks, setOwnedPerks]         = useState({});
   const [ownedUpgrades, setOwnedUpgrades]   = useState({});
   const [dpk, setDpk]                       = useState(1);
@@ -152,20 +165,33 @@ export default function EuroHustle() {
   const [moneyRain, setMoneyRain]           = useState([]);
   const [confetti, setConfetti]             = useState([]);
   const [quotePopup, setQuotePopup]         = useState(null);
-  const [powerFill, setPowerFill]           = useState(0);
   const [powerActive, setPowerActive]       = useState(false);
   const [powerTimer, setPowerTimer]         = useState(0);
-  const [billScale, setBillScale]           = useState(1);
   const [showCrownModal, setShowCrownModal] = useState(false);
   const [purchaseFlash, setPurchaseFlash]   = useState(null);
 
-  const eurosRef    = useRef(0);
-  const dpkRef      = useRef(1);
-  const powerRef    = useRef(false);
-  const nextId      = useRef(0);
-  eurosRef.current  = euros;
-  dpkRef.current    = dpk;
-  powerRef.current  = powerActive;
+  const euros = displayEuros;
+  const totalEarned = displayTotal;
+  const allTimeEarned = displayAllTime;
+  const allTimeClicks = displayClicks;
+  const powerFill = displayPowerFill;
+
+  useEffect(() => {
+    let raf;
+    const sync = () => {
+      if (rafDirty.current) {
+        rafDirty.current = false;
+        setDisplayEuros(eurosRef.current);
+        setDisplayTotal(totalEarnedRef.current);
+        setDisplayAllTime(allTimeRef.current);
+        setDisplayClicks(clicksRef.current);
+        setDisplayPowerFill(powerFillRef.current);
+      }
+      raf = requestAnimationFrame(sync);
+    };
+    raf = requestAnimationFrame(sync);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const currentSkinDef = RESKINS.find(r => r.id === activeSkin) || RESKINS[0];
   const theme = THEMES[currentSkinDef.themeId] || THEMES.default;
@@ -174,26 +200,29 @@ export default function EuroHustle() {
   useEffect(() => {
     let v = 1;
     PERKS.forEach(p => { v += p.baseDpk * (ownedPerks[p.id] || 0); });
+    dpkRef.current = v;
     setDpk(v);
   }, [ownedPerks]);
 
   useEffect(() => {
     let v = 0;
     UPGRADES.forEach(u => { v += u.baseDps * (ownedUpgrades[u.id] || 0); });
+    dpsRef.current = v;
     setDps(v);
   }, [ownedUpgrades]);
 
   useEffect(() => {
     const iv = setInterval(() => {
-      if (dps > 0) {
-        const g = dps / 20;
-        setEuros(e => e + g);
-        setTotalEarned(t => t + g);
-        setAllTimeEarned(t => t + g);
+      if (dpsRef.current > 0) {
+        const g = dpsRef.current / 20;
+        eurosRef.current += g;
+        totalEarnedRef.current += g;
+        allTimeRef.current += g;
+        rafDirty.current = true;
       }
     }, 50);
     return () => clearInterval(iv);
-  }, [dps]);
+  }, []);
 
   useEffect(() => {
     if (!powerActive) return;
@@ -203,39 +232,56 @@ export default function EuroHustle() {
   }, [powerActive, powerTimer]);
 
   const addRain = useCallback(() => {
-    const count = Math.min(3 + Math.floor(dpkRef.current / 1000), 10);
+    const count = Math.min(2 + Math.floor(dpkRef.current / 2000), 5);
     const drops = Array.from({ length: count }, () => ({
       id: nextId.current++,
       x: Math.random() * 100,
       size: 18 + Math.random() * 22,
-      dur: 1.1 + Math.random() * 0.9,
+      dur: 1.0 + Math.random() * 0.7,
     }));
-    setMoneyRain(prev => [...prev.slice(-50), ...drops]);
-    drops.forEach(d => setTimeout(() => setMoneyRain(prev => prev.filter(r => r.id !== d.id)), (d.dur+0.3)*1000));
+    setMoneyRain(prev => [...prev.slice(-25), ...drops]);
+    drops.forEach(d => setTimeout(() => setMoneyRain(prev => prev.filter(r => r.id !== d.id)), (d.dur+0.2)*1000));
   }, []);
 
+  const lastTapRef = useRef(0);
   const handleClick = useCallback((e) => {
+    const now = performance.now();
+    if (now - lastTapRef.current < 40) return;
+    lastTapRef.current = now;
+    if (e.type === "touchstart") e.preventDefault();
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const touch = e.touches?.[0];
+    const x = (touch ? touch.clientX : e.clientX) - rect.left;
+    const y = (touch ? touch.clientY : e.clientY) - rect.top;
     const mult = powerRef.current ? 3 : 1;
     const earned = Math.max(1, Math.floor(dpkRef.current * mult));
-    setEuros(ev => ev + earned);
-    setTotalEarned(t => t + earned);
-    setAllTimeEarned(t => t + earned);
-    setAllTimeClicks(c => c + 1);
-    setBillScale(0.9);
-    setTimeout(() => setBillScale(1), 110);
+
+    eurosRef.current += earned;
+    totalEarnedRef.current += earned;
+    allTimeRef.current += earned;
+    clicksRef.current += 1;
+
+    powerFillRef.current += 0.056;
+    if (powerFillRef.current >= 100) {
+      powerFillRef.current = 0;
+      setPowerActive(true);
+      setPowerTimer(8);
+    }
+    rafDirty.current = true;
+
+    if (billRef.current) {
+      billRef.current.style.transform = "scale(0.9)";
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (billRef.current) billRef.current.style.transform = "scale(1)";
+        });
+      });
+    }
+
     addRain();
-    // Very slow fill — ~1 powerup per 5 minutes of spam clicking (~300 taps/min = 0.056% per tap)
-    setPowerFill(p => {
-      const next = p + 0.056;
-      if (next >= 100) { setPowerActive(true); setPowerTimer(8); return 0; }
-      return next;
-    });
     const id = nextId.current++;
-    setFloats(prev => [...prev.slice(-20), { id, x, y, val: earned, big: mult > 1 }]);
-    setTimeout(() => setFloats(prev => prev.filter(f => f.id !== id)), 1400);
+    setFloats(prev => [...prev.slice(-12), { id, x, y, val: earned, big: mult > 1 }]);
+    setTimeout(() => setFloats(prev => prev.filter(f => f.id !== id)), 1200);
   }, [addRain]);
 
   const boom = useCallback((ex, ey) => {
@@ -264,7 +310,8 @@ export default function EuroHustle() {
     const c = ownedPerks[perk.id] || 0;
     const cost = getUpgradeCost(perk, c);
     if (eurosRef.current < cost) return;
-    setEuros(ev => ev - cost);
+    eurosRef.current -= cost;
+    rafDirty.current = true;
     setOwnedPerks(prev => ({ ...prev, [perk.id]: c+1 }));
     setAllTimePerks(n => n+1);
     setPurchaseFlash(perk.id);
@@ -278,7 +325,8 @@ export default function EuroHustle() {
     const c = ownedUpgrades[upg.id] || 0;
     const cost = getUpgradeCost(upg, c);
     if (eurosRef.current < cost) return;
-    setEuros(ev => ev - cost);
+    eurosRef.current -= cost;
+    rafDirty.current = true;
     setOwnedUpgrades(prev => ({ ...prev, [upg.id]: c+1 }));
     setAllTimeUpgrades(n => n+1);
     setPurchaseFlash(upg.id);
@@ -292,9 +340,11 @@ export default function EuroHustle() {
     if (eurosRef.current < FINAL_COST) return;
     const r = e.currentTarget.getBoundingClientRect();
     boom(r.left+r.width/2, r.top+r.height/2);
-    setEuros(0); setTotalEarned(0);
+    eurosRef.current = 0; totalEarnedRef.current = 0;
+    powerFillRef.current = 0; dpkRef.current = 1; dpsRef.current = 0;
+    rafDirty.current = true;
     setOwnedPerks({}); setOwnedUpgrades({});
-    setDpk(1); setDps(0); setPowerFill(0); setPowerActive(false);
+    setDpk(1); setDps(0); setPowerActive(false);
     setCrowns(c => c+1);
     setShowCrownModal(true);
   }, [boom]);
@@ -416,7 +466,7 @@ export default function EuroHustle() {
       </div>
 
       {/* tap zone */}
-      <div className="tap-zone" onClick={handleClick} style={{ position:"relative", height:"250px", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", userSelect:"none", overflow:"hidden", flexShrink:0 }}>
+      <div className="tap-zone" onClick={handleClick} onTouchStart={handleClick} style={{ position:"relative", height:"42vh", minHeight:"300px", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", userSelect:"none", overflow:"hidden", flexShrink:0, touchAction:"manipulation", WebkitTapHighlightColor:"transparent" }}>
 
         {/* power fill bar */}
         <div style={{ position:"absolute", left:"10px", top:"8%", bottom:"8%", width:"10px", background:"rgba(255,255,255,0.07)", borderRadius:"5px", overflow:"visible", zIndex:20 }}>
@@ -440,7 +490,7 @@ export default function EuroHustle() {
         })}
 
         {/* center */}
-        <div style={{ transform:`scale(${billScale})`, transition:"transform 0.11s cubic-bezier(.34,1.56,.64,1)", zIndex:10, position:"relative", filter:powerActive?`drop-shadow(0 0 22px ${accentColor}aa)`:`drop-shadow(0 6px 20px rgba(0,0,0,0.7))` }}>
+        <div ref={billRef} style={{ transform:"scale(1)", transition:"transform 80ms cubic-bezier(.34,1.56,.64,1)", zIndex:10, position:"relative", willChange:"transform", filter:powerActive?`drop-shadow(0 0 22px ${accentColor}aa)`:`drop-shadow(0 6px 20px rgba(0,0,0,0.7))` }}>
           {currentSkinDef.centerEmoji ? (
             <div style={{ width:"150px", height:"150px", borderRadius:"50%", background:`radial-gradient(circle,${theme.bg} 0%,${theme.bg}ee 100%)`, border:`4px solid ${accentColor}`, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", boxShadow:`0 0 40px ${accentColor}44` }}>
               {crowns>0 && <div style={{ fontSize:"12px", letterSpacing:"3px", marginBottom:"4px" }}>{"👑".repeat(Math.min(crowns,4))}</div>}

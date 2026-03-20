@@ -1,7 +1,7 @@
 import { Sun, Moon, LogOut, Globe } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { useNavigate, Link } from "react-router-dom";
-import logo from "@/assets/hankeit-logo.png";
+const logo = "/tiles/logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
