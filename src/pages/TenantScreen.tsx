@@ -2,15 +2,15 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/context/AppContext";
 import { useTranslation } from "@/hooks/useTranslation";
-const logo = "/tiles/logo.png";
-import { Music } from "lucide-react";
+import { Music, Globe, Sun, Moon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Globe } from "lucide-react";
+
+const logo = "/tiles/logo.png";
 
 const langLabels = {
   en: "English",
@@ -21,7 +21,7 @@ const langLabels = {
 const langOrder: Array<keyof typeof langLabels> = ["en", "sv", "fi"];
 
 const TenantScreen = () => {
-  const { setRole, language, setLanguage } = useApp();
+  const { setRole, language, setLanguage, darkMode, toggleDarkMode } = useApp();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -37,7 +37,14 @@ const TenantScreen = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 relative">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 flex items-center gap-1">
+        <button
+          onClick={toggleDarkMode}
+          className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground"
+          aria-label="Toggle theme"
+        >
+          {darkMode ? <Sun size={22} /> : <Moon size={22} />}
+        </button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground" aria-label="Change language">
@@ -84,7 +91,6 @@ const TenantScreen = () => {
         </p>
 
         <div className="flex flex-col gap-3 w-full">
-          {/* Songbook — available to everyone */}
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleSongbook}
@@ -94,19 +100,18 @@ const TenantScreen = () => {
             {t("songbook")}
           </motion.button>
 
-          {/* Student & Alumni side by side */}
           <div className="flex gap-3 w-full">
             <motion.button
               whileTap={{ scale: 0.97 }}
               onClick={() => handleSelect("student")}
-              className="flex-1 py-3 rounded-xl bg-hankeit-ice text-hankeit-deep font-semibold text-sm shadow-sm border border-accent/20 transition-colors hover:bg-accent/20"
+              className="flex-1 py-3 rounded-xl bg-muted text-foreground font-semibold text-sm shadow-sm border border-border transition-colors hover:bg-accent/20"
             >
               {t("student")}
             </motion.button>
             <motion.button
               whileTap={{ scale: 0.97 }}
               onClick={() => handleSelect("alumni")}
-              className="flex-1 py-3 rounded-xl bg-hankeit-ice text-hankeit-deep font-semibold text-sm shadow-sm border border-accent/20 transition-colors hover:bg-accent/20"
+              className="flex-1 py-3 rounded-xl bg-muted text-foreground font-semibold text-sm shadow-sm border border-border transition-colors hover:bg-accent/20"
             >
               {t("alumni")}
             </motion.button>

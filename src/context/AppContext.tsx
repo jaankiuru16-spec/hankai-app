@@ -23,7 +23,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return (localStorage.getItem("hankeit-lang") as Language) || "en";
   });
   const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("hankeit-dark") === "true";
+    const stored = localStorage.getItem("hankeit-dark");
+    return stored === null ? true : stored === "true";
   });
 
   useEffect(() => {
